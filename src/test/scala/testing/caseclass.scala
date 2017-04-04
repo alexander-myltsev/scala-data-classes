@@ -2,6 +2,9 @@ package testing.caseclass
 
 // example of feature parity with final case class
 
+@fommil.data
+class FooAnnotated(a: Boolean, s: String, i: Int)
+
 // @data(product = true, checkSerializable = false)
 // class Foo[+T](a: Boolean, s: String, t: T, i: Int = 0)
 final class Foo[+T] private (

@@ -14,6 +14,7 @@ class CaseClassParitySpec extends FlatSpec with ParallelTestExecution {
   // final case class Foo[+T] private (a: Boolean, s: String, t: T, i: Int = 0)
 
   val foo = Foo(true, "hello", "world", 1)
+  val fooAnnotated = FooAnnotated(true, "hello", 1)
 
   "@data(product) class Foo[+]" should "have equals, hashCode and toString defined" in {
     foo.hashCode shouldBe -1034845328

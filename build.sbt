@@ -2,11 +2,14 @@ inThisBuild(
   Seq(
     sonatypeGithub := ("fommil", "scala-data-classes"),
     licenses := Seq(Apache2),
-    scalaVersion := "2.12.1"
+    scalaVersion := "2.12.1",
+    addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M7" cross CrossVersion.full),
+    scalacOptions += "-Xplugin-require:macroparadise"
   )
 )
 
 libraryDependencies ++= Seq(
+ "org.scalameta" %% "scalameta" % "1.6.0",
  "com.google.guava" % "guava" % "21.0" % "test",
  "org.ensime" %% "pcplod" % "1.2.0" % "test",
  "org.typelevel" %% "cats" % "0.9.0" % "test",
