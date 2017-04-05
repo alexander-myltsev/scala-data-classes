@@ -7,6 +7,7 @@ import org.scalatest.Matchers._
 import org.scalatest.OptionValues._
 import testing.caseclass._
 import shapeless._
+import scala.meta._
 
 class CaseClassParitySpec extends FlatSpec with ParallelTestExecution {
   // should behave like:
@@ -14,7 +15,6 @@ class CaseClassParitySpec extends FlatSpec with ParallelTestExecution {
   // final case class Foo[+T] private (a: Boolean, s: String, t: T, i: Int = 0)
 
   val foo = Foo(true, "hello", "world", 1)
-  val fooAnnotated = FooAnnotated(true, "hello", 1)
 
   "@data(product) class Foo[+]" should "have equals, hashCode and toString defined" in {
     foo.hashCode shouldBe -1034845328
@@ -23,6 +23,21 @@ class CaseClassParitySpec extends FlatSpec with ParallelTestExecution {
     foo should not equal (Foo(false, "hello", "world", 1))
     foo.toString should equal("Foo(true,hello,world,1)")
     Foo.toString should equal("Foo")
+  }
+
+  it should "expand macros correctly" in {
+    val expanded = DataMacros.apply(q"""class FooAnnotated(a: Boolean, s: String)""")
+    expanded.toString should equal("""{
+    |  final class FooAnnotated private (a: Boolean, s: String) extends Serializable with Product {
+    |    def canEqual(that: Any): Boolean = ???
+    |    def productArity: Int = ???
+    |    def productElement(n: Int): Any = ???
+    |  }
+    |  object FooAnnotated extends Serializable {
+    |    override def toString = "FooAnnotated"
+    |    def apply(a: Boolean, s: String) = new FooAnnotated(a, s)
+    |  }
+    |}""".stripMargin)
   }
 
   it should "not expose its constructor" in {
