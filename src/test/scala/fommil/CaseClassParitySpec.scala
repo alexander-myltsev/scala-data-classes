@@ -15,6 +15,11 @@ class CaseClassParitySpec extends FlatSpec with ParallelTestExecution {
   // final case class Foo[+T] private (a: Boolean, s: String, t: T, i: Int = 0)
 
   val foo = Foo(true, "hello", "world", 1)
+  val className = "FooAnnotated"
+  val Term.Block(
+    (clazz @ Defn.Class(_, clsName, _, clazzCtor, _)) +:
+      (companionObject @ Defn.Object(_, objName, _)) +:
+      restStats) = DataMacros.apply(q"""class ${Type.Name(className)}(a: Boolean, s: String)""")
 
   "@data(product) class Foo[+]" should "have equals, hashCode and toString defined" in {
     foo.hashCode shouldBe -1034845328
@@ -25,22 +30,17 @@ class CaseClassParitySpec extends FlatSpec with ParallelTestExecution {
     Foo.toString should equal("Foo")
   }
 
-  it should "expand macros correctly" in {
-    val expanded = DataMacros.apply(q"""class FooAnnotated(a: Boolean, s: String)""")
-    expanded.toString should equal("""{
-    |  final class FooAnnotated private (a: Boolean, s: String) extends Serializable with Product {
-    |    def canEqual(that: Any): Boolean = ???
-    |    def productArity: Int = ???
-    |    def productElement(n: Int): Any = ???
-    |  }
-    |  object FooAnnotated extends Serializable {
-    |    override def toString = "FooAnnotated"
-    |    def apply(a: Boolean, s: String) = new FooAnnotated(a, s)
-    |  }
-    |}""".stripMargin)
+  it should "be a class with companion object" in {
+    restStats shouldBe empty
+    clsName.value should equal(className)
+    clazz.isInstanceOf[Defn.Class] shouldBe true
+    objName.value should equal(className)
+    companionObject.isInstanceOf[Defn.Object] shouldBe true
   }
 
   it should "not expose its constructor" in {
+    clazzCtor.mods.map { _.toString } should contain only "private"
+
     """new Foo(true, "hello", "world", 1)""" shouldNot compile
 
     """new Foo(true, "hello", "world")""" shouldNot compile
