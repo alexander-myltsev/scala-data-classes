@@ -87,6 +87,9 @@ object DataMods {
       collectMod("optimiseHeapStrings"),
       pairs.collect {
         case ("memoiseRefs", Right(refs)) => refs
+      }.headOption.getOrElse(Seq()),
+      pairs.collect {
+        case ("deriving", Right(refs)) => refs
       }.headOption.getOrElse(Seq())
     )
   }
@@ -104,7 +107,8 @@ final case class DataMods(product: Boolean = false,
                           optimiseHeapOptions: Boolean = false,
                           optimiseHeapBooleans: Boolean = false,
                           optimiseHeapStrings: Boolean = false,
-                          memoiseRefs: Seq[String] = Seq())
+                          memoiseRefs: Seq[String] = Seq(),
+                          deriving: Seq[String] = Seq())
 
 final case class DataInfo(name: Type.Name,
                           classParams: Seq[Term.Param],

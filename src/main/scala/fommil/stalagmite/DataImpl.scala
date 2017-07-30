@@ -149,6 +149,9 @@ object DataImpl {
           ),
           ((di: DataInfo) => di.requiredToPack) -> Seq(
             PackStats
+          ),
+          ((di: DataInfo) => di.dataMods.deriving.nonEmpty) -> Seq(
+            DataDerivationStats
           )
         )
 
@@ -166,7 +169,7 @@ object DataImpl {
 
         val newClass  = buildClass(dataInfo, builders)
         val newObject = buildObject(dataInfo, builders)
-        //println((newClass, newObject).toString())
+        println((newClass, newObject).toString())
 
         Term.Block(
           Seq(
@@ -179,7 +182,14 @@ object DataImpl {
     }
 }
 
-class data(product: Boolean = false,
+object Deriving extends Enumeration {
+  type Deriving = Value
+  val Monad, Functor = Value
+}
+
+class data(deriving: scala.Seq[Deriving.Value] =
+             scala.collection.immutable.Seq.empty[Deriving.Value],
+           product: Boolean = false,
            checkSerializable: Boolean = true,
            companionExtends: Boolean = false,
            serializable: Boolean = true,
@@ -210,6 +220,13 @@ class data(product: Boolean = false,
               ) =>
             "memoiseRefs" -> Right(symbols.collect {
               case q"scala.Symbol(${Lit.String(sym) })" => sym
+            })
+          case Term.Arg.Named(
+              Term.Name("deriving"),
+              Term.Apply(Term.Name("Seq"), symbols)
+              ) =>
+            "deriving" -> Right(symbols.collect {
+              case q"Deriving.${Term.Name(sym) }" => sym
             })
         }
         DataMods.fromPairs(pairs)

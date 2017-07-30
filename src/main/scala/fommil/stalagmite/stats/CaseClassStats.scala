@@ -224,4 +224,25 @@ object CaseClassStats {
       )
     }
   }
+
+  object DataDerivationStats extends DataStats {
+    override def objectStats(dataInfo: DataInfo): Seq[Stat] = {
+      val functorImplicitOpt =
+        if (dataInfo.dataMods.deriving.contains("Functor")) {
+          Some(q"""implicit val
+               ${Pat.Var
+            .Term(Term.Name(dataInfo.name.value + "Functor"))}: Functor[Foo] =
+               ???""")
+        } else None
+      val monadImplicitOpt =
+        if (dataInfo.dataMods.deriving.contains("Monad")) {
+          Some(q"""implicit val
+               ${Pat.Var
+            .Term(Term.Name(dataInfo.name.value + "Monad"))}: Monad[Foo] =
+                 ???""")
+        } else None
+
+      Seq(functorImplicitOpt, monadImplicitOpt).flatten
+    }
+  }
 }
