@@ -169,7 +169,7 @@ object DataImpl {
 
         val newClass  = buildClass(dataInfo, builders)
         val newObject = buildObject(dataInfo, builders)
-        println((newClass, newObject).toString())
+//        println((newClass, newObject).toString())
 
         Term.Block(
           Seq(
@@ -182,13 +182,7 @@ object DataImpl {
     }
 }
 
-object Deriving extends Enumeration {
-  type Deriving = Value
-  val Monad, Functor = Value
-}
-
-class data(deriving: scala.Seq[Deriving.Value] =
-             scala.collection.immutable.Seq.empty[Deriving.Value],
+class data(deriving: scala.Seq[scala.Symbol] = scala.Seq(),
            product: Boolean = false,
            checkSerializable: Boolean = true,
            companionExtends: Boolean = false,
@@ -214,19 +208,15 @@ class data(deriving: scala.Seq[Deriving.Value] =
         val pairs = args.collect {
           case Term.Arg.Named(Term.Name(name), Lit.Boolean(b)) =>
             name -> Left(b)
-          case Term.Arg.Named(
-              Term.Name("memoiseRefs"),
-              Term.Apply(Term.Name("Seq"), symbols)
-              ) =>
+          case Term.Arg.Named(Term.Name("memoiseRefs"),
+                              Term.Apply(Term.Name("Seq"), symbols)) =>
             "memoiseRefs" -> Right(symbols.collect {
               case q"scala.Symbol(${Lit.String(sym) })" => sym
             })
-          case Term.Arg.Named(
-              Term.Name("deriving"),
-              Term.Apply(Term.Name("Seq"), symbols)
-              ) =>
+          case Term.Arg.Named(Term.Name("deriving"),
+                              Term.Apply(Term.Name("Seq"), symbols)) =>
             "deriving" -> Right(symbols.collect {
-              case q"Deriving.${Term.Name(sym) }" => sym
+              case q"scala.Symbol(${Lit.String(sym) })" => sym
             })
         }
         DataMods.fromPairs(pairs)
