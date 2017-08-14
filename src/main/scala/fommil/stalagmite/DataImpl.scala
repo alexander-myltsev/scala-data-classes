@@ -169,7 +169,7 @@ object DataImpl {
 
         val newClass  = buildClass(dataInfo, builders)
         val newObject = buildObject(dataInfo, builders)
-//        println((newClass, newObject).toString())
+        //println((newClass, newObject).toString())
 
         Term.Block(
           Seq(
@@ -182,7 +182,7 @@ object DataImpl {
     }
 }
 
-class data(deriving: scala.Seq[scala.Symbol] = scala.Seq(),
+class data(deriving: AnyRef = scala.Seq(),
            product: Boolean = false,
            checkSerializable: Boolean = true,
            companionExtends: Boolean = false,
@@ -214,10 +214,13 @@ class data(deriving: scala.Seq[scala.Symbol] = scala.Seq(),
               case q"scala.Symbol(${Lit.String(sym) })" => sym
             })
           case Term.Arg.Named(Term.Name("deriving"),
-                              Term.Apply(Term.Name("Seq"), symbols)) =>
-            "deriving" -> Right(symbols.collect {
-              case q"scala.Symbol(${Lit.String(sym) })" => sym
+                              Term.Apply(Term.Name("Seq"), derivationNames)) =>
+            "deriving" -> Right(derivationNames.collect {
+              case Term.Name(derivationName) => derivationName
             })
+          case Term.Arg.Named(Term.Name("deriving"),
+                              Term.Name(derivationName)) =>
+            "deriving" -> Right(Seq(derivationName))
         }
         DataMods.fromPairs(pairs)
 
