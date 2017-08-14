@@ -89,7 +89,7 @@ object DataMods {
         case ("memoiseRefs", Right(refs)) => refs
       }.headOption.getOrElse(Seq()),
       pairs.collect {
-        case ("deriving", Right(refs)) => refs
+        case ("generic", Right(refs)) => refs
       }.headOption.getOrElse(Seq())
     )
   }
@@ -108,7 +108,7 @@ final case class DataMods(product: Boolean = false,
                           optimiseHeapBooleans: Boolean = false,
                           optimiseHeapStrings: Boolean = false,
                           memoiseRefs: Seq[String] = Seq(),
-                          deriving: Seq[String] = Seq())
+                          generic: Seq[String] = Seq())
 
 final case class DataInfo(name: Type.Name,
                           classParams: Seq[Term.Param],

@@ -15,7 +15,7 @@ class DerivationsSpec extends FlatSpec with ParallelTestExecution {
 
   val fooMeta = FooMetaDerive(true, "hello", 2)
 
-  "@data(deriving) class Foo" should "convert to Json" in {
+  "@data(generic) class Foo" should "convert to Json" in {
     fooMeta.toJson shouldBe JsObject("a" -> JsBoolean(fooMeta.a),
                                      "s" -> JsString(fooMeta.s),
                                      "i" -> JsNumber(fooMeta.i))
@@ -35,7 +35,7 @@ class DerivationsSpec extends FlatSpec with ParallelTestExecution {
   }
 
   it should "not be JsonFormat derivation by default" in {
-    """@data(deriving = Seq())
+    """@data(generic = Seq())
       |class FooNotJson(i: Int)
       |FooNotJson(42).toJson""".stripMargin shouldNot compile
   }

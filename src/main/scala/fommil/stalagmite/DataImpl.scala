@@ -150,8 +150,8 @@ object DataImpl {
           ((di: DataInfo) => di.requiredToPack) -> Seq(
             PackStats
           ),
-          ((di: DataInfo) => di.dataMods.deriving.nonEmpty) -> Seq(
-            DataDerivationStats
+          ((di: DataInfo) => di.dataMods.generic.nonEmpty) -> Seq(
+            GenericDerivationStats
           )
         )
 
@@ -182,7 +182,7 @@ object DataImpl {
     }
 }
 
-class data(deriving: AnyRef = scala.Seq(),
+class data(generic: AnyRef = scala.Seq(),
            product: Boolean = false,
            checkSerializable: Boolean = true,
            companionExtends: Boolean = false,
@@ -213,14 +213,14 @@ class data(deriving: AnyRef = scala.Seq(),
             "memoiseRefs" -> Right(symbols.collect {
               case q"scala.Symbol(${Lit.String(sym) })" => sym
             })
-          case Term.Arg.Named(Term.Name("deriving"),
+          case Term.Arg.Named(Term.Name("generic"),
                               Term.Apply(Term.Name("Seq"), derivationNames)) =>
-            "deriving" -> Right(derivationNames.collect {
+            "generic" -> Right(derivationNames.collect {
               case Term.Name(derivationName) => derivationName
             })
-          case Term.Arg.Named(Term.Name("deriving"),
-                              Term.Name(derivationName)) =>
-            "deriving" -> Right(Seq(derivationName))
+          case Term.Arg.Named(Term.Name("generic"),
+                              Term.Name(genericDerivationName)) =>
+            "generic" -> Right(Seq(genericDerivationName))
         }
         DataMods.fromPairs(pairs)
 

@@ -225,9 +225,9 @@ object CaseClassStats {
     }
   }
 
-  object DataDerivationStats extends DataStats {
+  object GenericDerivationStats extends DataStats {
     override def objectStats(dataInfo: DataInfo): Seq[Stat] =
-      dataInfo.dataMods.deriving.map { typ =>
+      dataInfo.dataMods.generic.map { typ =>
         q"""implicit val
             ${Pat.Var.Term(Term.Name(dataInfo.name.value + typ))}:
             ${Type.Name(typ)}[${Type.Name(dataInfo.name.value)}]
