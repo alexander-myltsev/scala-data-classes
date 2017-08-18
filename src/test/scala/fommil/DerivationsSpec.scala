@@ -13,12 +13,15 @@ import shapeless.cachedImplicit
 
 class DerivationsSpec extends FlatSpec with ParallelTestExecution {
 
-  val fooMeta = FooMetaDerive(true, "hello", 2)
+  val fooMetaGeneric    = FooMetaGeneric(true, "hello", 2)
+  val fooMetaSeqGeneric = FooMetaGenericSeq(true, "hello", 2)
 
   "@data(generic) class Foo" should "convert to Json" in {
-    fooMeta.toJson shouldBe JsObject("a" -> JsBoolean(fooMeta.a),
-                                     "s" -> JsString(fooMeta.s),
-                                     "i" -> JsNumber(fooMeta.i))
+    fooMetaSeqGeneric.toJson shouldBe JsObject(
+      "a" -> JsBoolean(fooMetaSeqGeneric.a),
+      "s" -> JsString(fooMetaSeqGeneric.s),
+      "i" -> JsNumber(fooMetaSeqGeneric.i)
+    )
   }
 
   it should "allow user-land Semigroup (Generic) derivation" in {
@@ -29,14 +32,17 @@ class DerivationsSpec extends FlatSpec with ParallelTestExecution {
   }
 
   it should "allow user-land JsonFormat (LabelledGeneric) derivation" in {
-    fooMeta.toJson.compactPrint should equal(
+    fooMetaGeneric.toJson.compactPrint should equal(
+      """{"a":true,"s":"hello","i":2}"""
+    )
+    fooMetaSeqGeneric.toJson.compactPrint should equal(
       """{"a":true,"s":"hello","i":2}"""
     )
   }
 
   it should "not be JsonFormat derivation by default" in {
-    """@data(generic = Seq())
+    """@data()
       |class FooNotJson(i: Int)
-      |FooNotJson(42).toJson""".stripMargin shouldNot compile
+      |implicitly[JsFormat[FooNotJson]].toJson""".stripMargin shouldNot compile
   }
 }

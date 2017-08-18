@@ -41,7 +41,8 @@ class FooMetaOptimiseHeap(a: Option[Boolean],
                           b: Option[Boolean],
                           s: Option[String])
 
-@data(
-  generic = Seq(JsonFormat)
-)
-class FooMetaDerive(a: Boolean, s: String, i: Int = 0)
+@data(generic = JsonFormat)
+class FooMetaGeneric(a: Boolean, s: String, i: Int = 0)
+
+@data(generic = Seq(JsonFormat))
+class FooMetaGenericSeq(a: Boolean, s: String, i: Int = 0)

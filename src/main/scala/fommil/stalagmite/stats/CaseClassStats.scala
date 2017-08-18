@@ -231,7 +231,7 @@ object CaseClassStats {
         q"""implicit val
             ${Pat.Var.Term(Term.Name(dataInfo.name.value + typ))}:
             ${Type.Name(typ)}[${Type.Name(dataInfo.name.value)}]
-              = cachedImplicit """
+              = cachedImplicit"""
       }
   }
 }

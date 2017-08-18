@@ -208,8 +208,10 @@ class data(generic: AnyRef = scala.Seq(),
         val pairs = args.collect {
           case Term.Arg.Named(Term.Name(name), Lit.Boolean(b)) =>
             name -> Left(b)
-          case Term.Arg.Named(Term.Name("memoiseRefs"),
-                              Term.Apply(Term.Name("Seq"), symbols)) =>
+          case Term.Arg.Named(
+              Term.Name("memoiseRefs"),
+              Term.Apply(Term.Name("Seq"), symbols)
+              ) =>
             "memoiseRefs" -> Right(symbols.collect {
               case q"scala.Symbol(${Lit.String(sym) })" => sym
             })
